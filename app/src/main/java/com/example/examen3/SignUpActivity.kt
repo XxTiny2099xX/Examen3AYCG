@@ -1,40 +1,29 @@
-package com.example.examen3
+private lateinit var dbHelper: DatabaseHelper
 
-import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_sign_up)
 
-class SignUpActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_sign_up)
+    dbHelper = DatabaseHelper(this)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.signupLayout)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+    val txtUsuario = findViewById<EditText>(R.id.txtUsuarioRegistro)
+    val txtContrasena = findViewById<EditText>(R.id.txtContrasenaRegistro)
+    val btnRegistrar = findViewById<Button>(R.id.btnRegistrar)
+    val lblMensaje = findViewById<TextView>(R.id.lblMensajeRegistro)
 
-        val txtUsuario = findViewById<EditText>(R.id.txtUsuarioRegistro)
-        val txtContrasena = findViewById<EditText>(R.id.txtContrasenaRegistro)
-        val btnRegistrar = findViewById<Button>(R.id.btnRegistrar)
-        val lblMensaje = findViewById<TextView>(R.id.lblMensajeRegistro)
+    btnRegistrar.setOnClickListener {
+        val usuario = txtUsuario.text.toString()
+        val contrasena = txtContrasena.text.toString()
 
-        btnRegistrar.setOnClickListener {
-            val usuario = txtUsuario.text.toString()
-            val contrasena = txtContrasena.text.toString()
-
-            if (usuario.isNotEmpty() && contrasena.isNotEmpty()) {
+        if (usuario.isNotEmpty() && contrasena.isNotEmpty()) {
+            val resultado = dbHelper.insertarJugador(usuario, contrasena)
+            if (resultado != -1L) {
                 lblMensaje.text = "Usuario $usuario registrado correctamente."
             } else {
-                lblMensaje.text = "Por favor, ingresa nombre de usuario y contraseña."
+                lblMensaje.text = "Error al registrar usuario."
             }
+        } else {
+            lblMensaje.text = "Por favor, ingresa nombre de usuario y contraseña."
         }
     }
 }

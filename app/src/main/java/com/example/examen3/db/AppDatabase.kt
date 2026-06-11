@@ -1,14 +1,42 @@
-package com.example.examen3.db
+package com.example.examen3
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import com.example.examen3.converters.Converters
-import com.example.examen3.dao.UsuarioDao
-import com.example.examen3.model.Usuario
+import android.content.ContentValues
+import android.content.Context
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
 
-@Database(entities = [Usuario::class], version= 1)
-@TypeConverters(Converters::class)
-abstract class AppDatabase: RoomDatabase() {
-    abstract fun usuarioDao(): UsuarioDao
+class DatabaseHelper(context: Context) :
+    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+
+    companion object {
+        private const val DATABASE_NAME = "jugadores.db"
+        private const val DATABASE_VERSION = 1
+        private const val TABLE_JUGADOR = "jugador"
+        private const val COLUMN_ID = "id"
+        private const val COLUMN_USUARIO = "usuario"
+        private const val COLUMN_CONTRASENA = "contrasena"
+
+        private const val CREATE_TABLE = "CREATE TABLE $TABLE_JUGADOR (" +
+                "$COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "$COLUMN_USUARIO TEXT, " +
+                "$COLUMN_CONTRASENA TEXT)"
+    }
+
+    override fun onCreate(db: SQLiteDatabase) {
+        db.execSQL(CREATE_TABLE)
+    }
+
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_JUGADOR")
+        onCreate(db)
+    }
+
+    fun insertarJugador(usuario: String, contrasena: String): Long {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_USUARIO, usuario)
+            put(COLUMN_CONTRASENA, contrasena)
+        }
+        return db.insert(TABLE_JUGADOR, null, values)
+    }
 }
